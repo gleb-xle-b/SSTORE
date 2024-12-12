@@ -11,6 +11,7 @@ module org.example.store {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
 
+    opens Controllers to javafx.fxml;
     opens org.example.store to javafx.fxml;
     exports org.example.store;
 }
