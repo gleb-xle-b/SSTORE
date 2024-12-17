@@ -1,4 +1,4 @@
-package Controllers;
+package org.example.store.Controllers;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -7,14 +7,15 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import Models.Product;
 import javafx.stage.Stage;
-
-//import com.example.universitytest.models.Employee;
+import org.example.store.Models.Product;
 
 public class MainController {
+
     @FXML
     private TableView<Product> productTable;
+    @FXML
+    private TableColumn<Product, Integer> idColumn;  // Столбец для ID
     @FXML
     private TableColumn<Product, String> nameColumn;
     @FXML
@@ -24,41 +25,46 @@ public class MainController {
     @FXML
     private TableColumn<Product, String> categoryColumn;
     @FXML
+    private TableColumn<Product, String> descriptionColumn;  // Столбец для описания
+    @FXML
+    private TableColumn<Product, Integer> supplierIdColumn;  // Столбец для ID поставщика
+    @FXML
     private Label statusLabel;
 
     private ObservableList<Product> productList;
 
     @FXML
     public void initialize() {
-        // Создаем тестовые данные
-        productList = FXCollections.observableArrayList(
-                new Product("Apple", 1.0, 50, "Fruits"),
-                new Product("Milk", 1.5, 30, "Dairy"),
-                new Product("Bread", 2.0, 20, "Bakery")
-        );
-
         // Привязываем колонки к свойствам модели
+        idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
         quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
         categoryColumn.setCellValueFactory(cellData -> cellData.getValue().categoryProperty());
+        descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
+        supplierIdColumn.setCellValueFactory(cellData -> cellData.getValue().supplierIdProperty().asObject());
 
-        // Добавляем данные в таблицу
+        // Инициализируем список продуктов
+        productList = FXCollections.observableArrayList();
+
+        // Устанавливаем список товаров в таблицу
         productTable.setItems(productList);
 
         // Обновляем статус
         updateStatusLabel();
     }
 
+    // Метод для добавления товара
     @FXML
     private void addProduct() {
-        Product newProduct = showProductForm(null);
+        Product newProduct = showProductForm(null);  // null означает, что мы создаём новый товар
         if (newProduct != null) {
             productList.add(newProduct);
             updateStatusLabel();
         }
     }
 
+    // Метод для удаления товара
     @FXML
     private void deleteProduct() {
         Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
@@ -70,6 +76,7 @@ public class MainController {
         }
     }
 
+    // Метод для обновления товара
     @FXML
     private void updateProduct() {
         Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
@@ -83,31 +90,28 @@ public class MainController {
         }
     }
 
+    // Обновление статуса (количества товаров)
     private void updateStatusLabel() {
         statusLabel.setText("Выбрано: " + productTable.getItems().size() + " товаров");
     }
 
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
+    // Метод для отображения окна добавления/редактирования товара
     private Product showProductForm(Product product) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/store/product_form.fxml"));
             Parent parent = loader.load();
 
+            // Получаем контроллер формы для товара
             ProductFormController controller = loader.getController();
-            controller.setProduct(product);
+            controller.setProduct(product);  // Передаем товар в форму (если редактируем)
 
+            // Открываем окно
             Stage stage = new Stage();
             stage.setTitle("Добавить/Изменить товар");
             stage.setScene(new Scene(parent));
             stage.showAndWait();
 
+            // Если пользователь сохранил товар, возвращаем объект продукта
             if (controller.isSaveClicked()) {
                 return controller.getProduct();
             }
@@ -118,4 +122,12 @@ public class MainController {
         return null;
     }
 
+    // Метод для отображения информационных окон с сообщениями
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 }
