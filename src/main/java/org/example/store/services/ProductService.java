@@ -16,7 +16,7 @@ public class ProductService {
     // Получение всех продуктов из базы данных
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
-        String query = "SELECT * FROM products";
+        String query = "SELECT * FROM productsSELECT * FROM products";
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
@@ -62,6 +62,35 @@ public class ProductService {
         }
     }
 
+    public String getCategoryById(int categoryId) {
+        String query = "SELECT name FROM categories WHERE category_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, categoryId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getString("name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Выведите исключение для отладки
+        }
+        return "Неизвестная категория"; // Если должность не найдена
+    }
+
+
+    public int getCategoryIdByName(String categoryName) {
+        String query = "SELECT category_id FROM categories WHERE name = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, categoryName);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("category_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
     // Обновление данных продукта в базе данных
     public boolean updateProduct(Product product) {
         String query = "UPDATE products SET name = ?, description = ?, price = ?, quantity = ?, category_id = ?, supplier_id = ? WHERE product_id = ?";
@@ -73,7 +102,7 @@ public class ProductService {
             preparedStatement.setInt(4, product.getQuantity());
             preparedStatement.setInt(5, product.getCategoryId());  // Используем categoryId
             preparedStatement.setInt(6, product.getSupplierId());  // Используем supplierId
-            preparedStatement.setInt(7, product.getProductId());
+            preparedStatement.setInt(7, product.getId());
 
             int rowsAffected = preparedStatement.executeUpdate();
             return rowsAffected > 0;

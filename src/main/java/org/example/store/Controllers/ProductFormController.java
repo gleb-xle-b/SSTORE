@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.example.store.Models.Product;
+import org.example.store.services.ProductService;
 
 public class ProductFormController {
 
@@ -29,6 +30,7 @@ public class ProductFormController {
 
     private Product product;
     private boolean isSaveClicked = false;
+    private ProductService productService;
 
     // Метод для установки значения product
     public void setProduct(Product product) {
@@ -40,7 +42,7 @@ public class ProductFormController {
             nameField.setText(product.getName());
             priceField.setText(String.valueOf(product.getPrice()));
             quantityField.setText(String.valueOf(product.getQuantity()));
-            categoryField.setText(product.getCategory());
+            categoryField.setText(productService.getCategoryById(product.getCategoryId()));
             descriptionField.setText(product.getDescription());
             supplierIdField.setText(String.valueOf(product.getSupplierId()));
         }
@@ -70,17 +72,17 @@ public class ProductFormController {
                 product.setName(nameField.getText());
                 product.setPrice(price);
                 product.setQuantity(quantity);
-                product.setCategory(categoryField.getText());
+                product.setCategoryId(productService.getCategoryIdByName(categoryField.getText()));
                 product.setDescription(descriptionField.getText());
                 product.setSupplierId(supplierId);
             } else {
                 product = new Product(
                         Integer.parseInt(idField.getText()),  // ID товара
                         nameField.getText(),
+                        descriptionField.getText(),
                         price,
                         quantity,
-                        categoryField.getText(),
-                        descriptionField.getText(),
+                        productService.getCategoryIdByName(categoryField.getText()),
                         supplierId
                 );
             }

@@ -13,17 +13,17 @@ public class Product {
     private StringProperty name;
     private DoubleProperty price;
     private IntegerProperty quantity;
-    private StringProperty category;
+    private IntegerProperty categoryId;
     private StringProperty description;  // Новое поле для описания товара
     private IntegerProperty supplierId;  // Новое поле для ID поставщика
 
     // Конструктор
-    public Product(int id, String name, double price, int quantity, String category, String description, int supplierId) {
+    public Product(int id, String name, String description, double price, int quantity, int categoryId, int supplierId) {
         this.id = new SimpleIntegerProperty(id);
         this.name = new SimpleStringProperty(name);
         this.price = new SimpleDoubleProperty(price);
         this.quantity = new SimpleIntegerProperty(quantity);
-        this.category = new SimpleStringProperty(category);
+        this.categoryId = new SimpleIntegerProperty(categoryId);
         this.description = new SimpleStringProperty(description);  // Инициализация нового поля
         this.supplierId = new SimpleIntegerProperty(supplierId);  // Инициализация нового поля
     }
@@ -79,16 +79,16 @@ public class Product {
         return quantity;
     }
 
-    public String getCategory() {
-        return category.get();
+    public int getCategoryId() {
+        return categoryId.get();
     }
 
-    public void setCategory(String category) {
-        this.category.set(category);
+    public void setCategoryId(int categoryId) {
+        this.categoryId.set(categoryId);
     }
 
-    public StringProperty categoryProperty() {
-        return category;
+    public IntegerProperty categoryIdProperty() {
+        return categoryId;
     }
 
     public String getDescription() {
@@ -124,9 +124,10 @@ public class Product {
                 ", name='" + name.get() + '\'' +
                 ", price=" + price.get() +
                 ", quantity=" + quantity.get() +
-                ", category='" + category.get() + '\'' +
+                ", category='" + categoryId.get() + '\'' +
                 ", description='" + description.get() + '\'' +
                 ", supplierId=" + supplierId.get() +
                 '}';
     }
+
 }

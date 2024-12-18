@@ -1,5 +1,6 @@
 package org.example.store.Controllers;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.example.store.Models.Product;
+import org.example.store.services.ProductService;
 
 public class MainController {
 
@@ -32,6 +34,7 @@ public class MainController {
     private Label statusLabel;
 
     private ObservableList<Product> productList;
+    private ProductService productService;
 
     @FXML
     public void initialize() {
@@ -40,7 +43,9 @@ public class MainController {
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
         quantityColumn.setCellValueFactory(cellData -> cellData.getValue().quantityProperty().asObject());
-        categoryColumn.setCellValueFactory(cellData -> cellData.getValue().categoryProperty());
+        //categoryColumn.setCellValueFactory(cellData -> cellData.getValue().categoryProperty());
+        categoryColumn.setCellValueFactory(cellData ->
+                new SimpleStringProperty(productService.getCategoryById(cellData.getValue().getCategoryId())));
         descriptionColumn.setCellValueFactory(cellData -> cellData.getValue().descriptionProperty());
         supplierIdColumn.setCellValueFactory(cellData -> cellData.getValue().supplierIdProperty().asObject());
 
@@ -121,6 +126,8 @@ public class MainController {
         }
         return null;
     }
+
+
 
     // Метод для отображения информационных окон с сообщениями
     private void showAlert(String title, String content) {
