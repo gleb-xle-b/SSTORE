@@ -7,7 +7,7 @@ import java.util.List;
 import java.sql.*;
 
 public class ProductService {
-    private Connection connection;
+    private final Connection connection;
 
     public ProductService(Connection connection) {
         this.connection = connection;
@@ -16,14 +16,14 @@ public class ProductService {
     // Получение всех продуктов из базы данных
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
-        String query = "SELECT * FROM productsSELECT * FROM products";
+        String query = "SELECT * FROM products";
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
 
             while (resultSet.next()) {
                 // Извлекаем данные из ResultSet и создаем объекты Product
-                int productId = resultSet.getInt("product_id");
+                //int productId = resultSet.getInt("product_id");
                 String name = resultSet.getString("name");
                 String description = resultSet.getString("description");
                 double price = resultSet.getDouble("price");
@@ -31,7 +31,8 @@ public class ProductService {
                 int categoryId = resultSet.getInt("category_id");  // Исправляем на categoryId
                 int supplierId = resultSet.getInt("supplier_id");
 
-                Product product = new Product(productId, name, description, price, quantity, categoryId, supplierId);
+                Product product = new Product(name, description, price, quantity, categoryId, supplierId);
+                product.setId(resultSet.getInt("product_id"));
                 products.add(product);
             }
         } catch (SQLException e) {

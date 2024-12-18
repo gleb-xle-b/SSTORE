@@ -1,5 +1,7 @@
 package org.example.store.Controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -7,7 +9,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.example.store.Models.Product;
+import org.example.store.database.DatabaseConnection;
 import org.example.store.services.ProductService;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class ProductFormController {
 
@@ -30,7 +36,18 @@ public class ProductFormController {
 
     private Product product;
     private boolean isSaveClicked = false;
+    private Connection connection;
+    {try {
+        connection = DatabaseConnection.getConnection();
+    } catch (
+    SQLException e) {
+        throw new RuntimeException(e);
+    }}
     private ProductService productService;
+
+    public void setProductService(ProductService productService) {
+        this.productService = productService;
+    }
 
     // Метод для установки значения product
     public void setProduct(Product product) {
@@ -53,7 +70,7 @@ public class ProductFormController {
     }
 
     // Метод для сохранения изменений
-    @FXML
+    /*@FXML
     private void onSave() {
         try {
             // Проверка на пустые поля
@@ -96,7 +113,56 @@ public class ProductFormController {
             errorLabel.setText(e.getMessage());
             errorLabel.setVisible(true);
         }
+    }*/
+
+
+    private ObservableList<Product> productList = FXCollections.observableArrayList();
+
+    @FXML
+    private void onSave() {
+        ProductService productService = new ProductService(connection);
+        if (!(nameField.getText().isEmpty() || priceField.getText().isEmpty() || quantityField.getText().isEmpty() ||
+                categoryField.getText().isEmpty() || descriptionField.getText().isEmpty() || supplierIdField.getText().isEmpty())) {
+            try {
+                // Преобразуем данные из текстовых полей
+                String name = nameField.getText();
+                String description = descriptionField.getText();
+                double price = Double.parseDouble(priceField.getText());
+                int quantity = Integer.parseInt(quantityField.getText());
+                int categoryId = productService.getCategoryIdByName(categoryField.getText());
+                int supplierId = Integer.parseInt(supplierIdField.getText());
+
+                // Создаем новый продукт
+                Product newProduct = new Product(
+                        name,
+                        description,
+                        price,
+                        quantity,
+                        categoryId,
+                        supplierId
+                );
+
+                // Добавляем продукт в базу данных
+                productService.addProduct(newProduct);
+
+                // Добавляем продукт в локальный список и обновляем таблицу
+                if (productList != null) {
+                    productList.add(newProduct); // Обновляем общий список
+                }
+
+                isSaveClicked = true;
+                closeWindow();
+
+            } catch (NumberFormatException e) {
+                errorLabel.setText("Ошибка ввода данных. Пожалуйста, проверьте цену, количество и ID поставщика.");
+                errorLabel.setVisible(true);
+            }
+        } else {
+            errorLabel.setText("Заполните все поля");
+            errorLabel.setVisible(true);
+        }
     }
+
 
     // Метод для отмены изменений
     @FXML

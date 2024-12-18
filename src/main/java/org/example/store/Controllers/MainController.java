@@ -10,7 +10,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.example.store.Models.Product;
+import org.example.store.database.DatabaseConnection;
 import org.example.store.services.ProductService;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
 public class MainController {
 
@@ -35,9 +40,20 @@ public class MainController {
 
     private ObservableList<Product> productList;
     private ProductService productService;
+    public void setProductService(ProductService productService) {
+        this.productService = productService;
+    }
+    private Connection connection;
+    {try {
+        connection = DatabaseConnection.getConnection();
+    } catch (
+            SQLException e) {
+        throw new RuntimeException(e);
+    }}
 
     @FXML
     public void initialize() {
+        ProductService productService = new ProductService(connection);
         // Привязываем колонки к свойствам модели
         idColumn.setCellValueFactory(cellData -> cellData.getValue().idProperty().asObject());
         nameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -52,6 +68,14 @@ public class MainController {
         // Инициализируем список продуктов
         productList = FXCollections.observableArrayList();
 
+        //ProductService productService = new ProductService(connection);
+        // Загрузка сотрудников из базы данных
+        List<Product> products = productService.getAllProducts();
+        if (products.isEmpty()) {
+            showAlert("Ошибка", "Нет доступных продуктов для отображения.");
+        } else {
+            productList.addAll(products);
+        }
         // Устанавливаем список товаров в таблицу
         productTable.setItems(productList);
 
@@ -66,6 +90,7 @@ public class MainController {
         if (newProduct != null) {
             productList.add(newProduct);
             updateStatusLabel();
+            productTable.refresh();
         }
     }
 

@@ -18,8 +18,8 @@ public class Product {
     private IntegerProperty supplierId;  // Новое поле для ID поставщика
 
     // Конструктор
-    public Product(int id, String name, String description, double price, int quantity, int categoryId, int supplierId) {
-        this.id = new SimpleIntegerProperty(id);
+    public Product(String name, String description, double price, int quantity, int categoryId, int supplierId) {
+        this.id = new SimpleIntegerProperty(-1);
         this.name = new SimpleStringProperty(name);
         this.price = new SimpleDoubleProperty(price);
         this.quantity = new SimpleIntegerProperty(quantity);
