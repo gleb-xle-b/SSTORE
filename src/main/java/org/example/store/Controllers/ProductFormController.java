@@ -3,10 +3,7 @@ package org.example.store.Controllers;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import org.example.store.Models.Product;
 import org.example.store.database.DatabaseConnection;
@@ -14,8 +11,9 @@ import org.example.store.services.ProductService;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
-public class ProductFormController {
+public class ProductFormController extends MainController {
 
     @FXML
     private TextField idField;
@@ -67,6 +65,88 @@ public class ProductFormController {
 
     public boolean isSaveClicked() {
         return isSaveClicked;
+    }
+
+
+    /*name, description, price, quantity, categoryId, supplierId*/
+
+    @FXML
+    private void loadProductDataForEditing() {
+        Product selectedProduct = MainController.productTable.getSelectionModel().getSelectedItem();
+        if (selectedProduct != null) {
+            // Заполняем текстовые поля
+            nameField.setText(selectedProduct.getName());
+            descriptionField.setText(selectedProduct.getDescription());
+            priceField.setText(String.valueOf(selectedProduct.getPrice()));
+            quantityField.setText(String.valueOf(selectedProduct.getQuantity()));
+            categoryField.setText(String.valueOf(productService.getCategoryById(selectedProduct.getCategoryId())));
+            supplierIdField.setText(String.valueOf(selectedProduct.getSupplierId()));
+            //hoursWorkedField.setText(String.valueOf(selectedEmployee.getHoursWorked())); // Поле часов работы
+
+            // Заполняем ComboBox для должности и выбираем текущую
+            /*List<String> positions = employeeService.getAllPositions();
+            positionComboBox.getItems().setAll(positions);
+            positionComboBox.setValue(employeeService.getPositionById(selectedEmployee.getPositionId()));*/
+
+            // Заполняем ComboBox для отдела и выбираем текущий
+            /*List<String> departments = employeeService.getAllDepartments();
+            departmentComboBox.getItems().setAll(departments);
+            departmentComboBox.setValue(employeeService.getDepartmentById(selectedEmployee.getDepartmentId()));*/
+
+        } else {
+            showAlert("Ошибка", "Выберите сотрудника для редактирования.");
+        }
+    }
+
+
+
+    @FXML
+    private void handleSaveProductChanges() {
+        Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
+        if (selectedProduct != null) {
+            try {
+                /*name, description, price, quantity, categoryId, supplierId*/
+
+                // Получаем данные из текстовых полей
+                String name = nameField.getText();
+                String description = descriptionField.getText();
+                double price = Double.parseDouble(priceField.getText());
+                int quantity = Integer.parseInt(quantityField.getText());
+                String category = categoryField.getText();
+                int supplierId = Integer.parseInt(supplierIdField.getText());
+
+                // Получаем ID должности и отдела
+                int categoryId = productService.getCategoryIdByName(category);
+
+                // Обновляем данные сотрудника
+                selectedProduct.setName(name);
+                selectedProduct.setDescription(description);
+                selectedProduct.setPrice(price);
+                selectedProduct.setQuantity(quantity);
+                selectedProduct.setCategoryId(categoryId);
+                selectedProduct.setSupplierId(supplierId);
+
+                // Обновляем данные в базе
+                productService.updateProduct(selectedProduct);
+
+                // Обновляем таблицу сотрудников
+                productService.updateProduct(selectedProduct);
+
+                // Очищаем все поля
+                nameField.clear();
+                descriptionField.clear();
+                priceField.clear();
+                quantityField.clear();
+                categoryField.clear();
+                supplierIdField.clear();
+                showAlert("Успех", "Данные о продукте успешно обновлены.");
+            } catch (NumberFormatException e) {
+                showAlert("Ошибка", "Некорректный ввод данных.");
+            }
+        } else {
+            showAlert("Ошибка", "Выберите сотрудника для сохранения изменений.");
+        }
+        //originalEmployeeList = new ArrayList<>(employeeTable.getItems());
     }
 
     // Метод для сохранения изменений
@@ -149,6 +229,7 @@ public class ProductFormController {
                 if (productList != null) {
                     productList.add(newProduct); // Обновляем общий список
                 }
+
 
                 isSaveClicked = true;
                 closeWindow();

@@ -12,6 +12,7 @@ module org.example.store {
     requires com.almasb.fxgl.all;
 
     requires java.sql;
+    requires java.desktop;
 
     //opens com.example.universitytest.controllers to javafx.fxml; // Добавьте эту строку
 
